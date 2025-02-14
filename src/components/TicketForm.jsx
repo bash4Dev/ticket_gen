@@ -331,13 +331,15 @@ const TicketForm = ({ onSubmitSuccess }) => {
       {/* Navigation Section */}
       <div className="form-navigation">
         {step === 1 && (
-          <button
+         <div style={{ display: "flex", justifyContent: "flex-end", width: "100%"}}>
+           <button
             type="button" 
             className="button primary"
             onClick={handleNext}
           >
             Next
           </button>
+         </div>
         )}
         {step === 2 && (
           <>
