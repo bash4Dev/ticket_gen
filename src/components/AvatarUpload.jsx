@@ -1,5 +1,5 @@
 // src/components/AvatarUpload.js
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 const AvatarUpload = ({ onUploadSuccess, error, onError = (message) => console.error('Upload error:', message) }) => {
@@ -57,7 +57,7 @@ const AvatarUpload = ({ onUploadSuccess, error, onError = (message) => console.e
                   <p>Uploading your image...</p>
                 </div>
               ) : (
-                <p>Drag and Drop or Click to Upload</p>
+                <p>Drag & Drop or Click to Upload</p>
               ) }
             </div>
           ) }

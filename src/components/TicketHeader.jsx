@@ -1,5 +1,3 @@
-import React from 'react';
-
 function TicketHeader({ step, totalSteps }) {
   const progressPercentage = (step / totalSteps) * 100;
   let title = "";
@@ -19,6 +17,5 @@ function TicketHeader({ step, totalSteps }) {
     </div>
   );
 }
-//hello
 
 export default TicketHeader;

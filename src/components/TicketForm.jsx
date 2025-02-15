@@ -1,5 +1,4 @@
-// src/components/TicketForm.js
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AvatarUpload from "./AvatarUpload";
 import TicketHeader from "./TicketHeader";
 
@@ -23,19 +22,13 @@ const TicketForm = ({ onSubmitSuccess }) => {
   const totalSteps = 3;
   const [step, setStep] = useState(1);
 
-  // Load form data and step from localStorage
   useEffect(() => {
     const savedData = localStorage.getItem("ticketData");
     const savedStep = localStorage.getItem("ticketStep");
-    if (savedData) {
-      setFormData(JSON.parse(savedData));
-    }
-    if (savedStep) {
-      setStep(Number(savedStep));
-    }
+    if (savedData) setFormData(JSON.parse(savedData));
+    if (savedStep) setStep(Number(savedStep));
   }, []);
 
-  // useEffect to persist form data and steps in localStorage
   useEffect(() => {
     localStorage.setItem("ticketData", JSON.stringify(formData));
     localStorage.setItem("ticketStep", step);
@@ -43,20 +36,18 @@ const TicketForm = ({ onSubmitSuccess }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
   };
 
   const handleAvatarUpload = (url) => {
-    setFormData((prev) => ({ ...prev, avatarUrl: url }));
-    setErrors((prev) => ({ ...prev, avatar: "" }));
+    setFormData(prev => ({ ...prev, avatarUrl: url }));
+    setErrors(prev => ({ ...prev, avatar: "" }));
   };
 
   const handleTicketSelect = (type) => {
-    setFormData((prev) => ({ ...prev, selectedTicketType: type }));
-    setErrors((prev) => ({ ...prev, ticketType: "" }));
+    setFormData(prev => ({ ...prev, selectedTicketType: type }));
+    setErrors(prev => ({ ...prev, ticketType: "" }));
   };
 
   const validateStep = () => {
@@ -86,13 +77,11 @@ const TicketForm = ({ onSubmitSuccess }) => {
   };
 
   const handleNext = () => {
-    if (validateStep()) {
-      setStep((prev) => Math.min(prev + 1, totalSteps));
-    }
+    if (validateStep()) setStep(prev => Math.min(prev + 1, totalSteps));
   };
 
   const handleBack = () => {
-    setStep((prev) => Math.max(prev - 1, 1));
+    setStep(prev => Math.max(prev - 1, 1));
   };
 
   const getTicketPrice = (type) => {
@@ -104,18 +93,20 @@ const TicketForm = ({ onSubmitSuccess }) => {
     }
   };
 
-  // Generate ticket details
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateStep()) {
-      onSubmitSuccess({
-        ...formData,
-        ticketPrice: getTicketPrice(formData.selectedTicketType)
-      });
+      if (step === totalSteps) {
+        onSubmitSuccess({
+          ...formData,
+          ticketPrice: getTicketPrice(formData.selectedTicketType)
+        });
+      } else {
+        setStep(prev => prev + 1);
+      }
     }
   };
 
-  // Reset form for a new ticket
   const handleBookAnother = () => {
     setFormData({
       fullName: "",
@@ -131,14 +122,12 @@ const TicketForm = ({ onSubmitSuccess }) => {
     localStorage.removeItem("ticketStep");
   };
 
-  // Download ticket details as a text file
   const handleDownloadTicket = () => {
     const ticketInfo = `
       Name: ${formData.fullName}
       Email: ${formData.email}
       Ticket Type: ${formData.selectedTicketType}
       Quantity: ${formData.ticketQuantity}
-      Total: $${getTicketPrice(formData.selectedTicketType) * formData.ticketQuantity}
       About: ${formData.aboutProject}
     `;
     const blob = new Blob([ticketInfo], { type: 'text/plain' });
@@ -218,7 +207,7 @@ const TicketForm = ({ onSubmitSuccess }) => {
             <div className="form-group">
               <AvatarUpload
                 onUploadSuccess={handleAvatarUpload}
-                onError={(msg) => setErrors((prev) => ({ ...prev, avatar: msg }))}
+                onError={(msg) => setErrors(prev => ({ ...prev, avatar: msg }))}
                 error={errors.avatar}
               />
               {errors.avatar && (
@@ -234,13 +223,10 @@ const TicketForm = ({ onSubmitSuccess }) => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                aria-describedby="fullNameError"
                 className="form-input"
               />
               {errors.fullName && (
-                <span id="fullNameError" className="error-message">
-                  {errors.fullName}
-                </span>
+                <span className="error-message">{errors.fullName}</span>
               )}
             </div>
 
@@ -252,13 +238,10 @@ const TicketForm = ({ onSubmitSuccess }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                aria-describedby="emailError"
                 className="form-input"
               />
               {errors.email && (
-                <span id="emailError" className="error-message">
-                  {errors.email}
-                </span>
+                <span className="error-message">{errors.email}</span>
               )}
             </div>
 
@@ -269,7 +252,6 @@ const TicketForm = ({ onSubmitSuccess }) => {
                 name="aboutProject"
                 value={formData.aboutProject}
                 onChange={handleInputChange}
-                placeholder="Textarea"
                 className="form-input"
                 rows={6}
               />
@@ -278,68 +260,49 @@ const TicketForm = ({ onSubmitSuccess }) => {
         )}
 
         {step === 3 && (
+          <>
+          <h2 className="confirmation-title">Your Ticket is Booked!</h2>
           <div className="confirmation-wrapper">
-            {/* <h2 className="confirmation-title">Ticket Confirmed!</h2> */}
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: "100%" }}></div>
-            </div>
             <div className="confirmation-card">
               <div className="user-avatar">
                 {formData.avatarUrl ? (
                   <img 
                     src={formData.avatarUrl} 
                     alt="Avatar" 
-                    className="confirmation-image" 
+                    className="avatar-preview" 
                   />
                 ) : (
-                  <div className="avatar-placeholder">No Image</div>
+                  <div className="avatar-placeholder">No Avatar</div>
                 )}
               </div>
               <div className="user-details">
-                <table className="ticket-table">
-                  <tbody>
-                    <tr>
-                      <th>Name:</th>
-                      <td>{formData.fullName}</td>
-                    </tr>
-                    <tr>
-                      <th>Email:</th>
-                      <td>{formData.email}</td>
-                    </tr>
-                    <tr>
-                      <th>Ticket Type:</th>
-                      <td>{formData.selectedTicketType.toLowerCase()}</td>
-                    </tr>
-                    {/* <tr>
-                      <th>Quantity:</th>
-                      <td>{formData.ticketQuantity}</td>
-                    </tr> */}
-                    {formData.aboutProject && (
-                      <tr>
-                        <th>About Project:</th>
-                        <td>{formData.aboutProject}</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                <div className="ticket-info">
+                  <p><strong>Name:</strong> {formData.fullName}</p>
+                  <p><strong>Email:</strong> {formData.email}</p>
+                  <p><strong>Ticket Type:</strong> {formData.selectedTicketType}</p>
+                  <p><strong>Quantity:</strong> {formData.ticketQuantity}</p>
+                  <p><strong>About Project:</strong> {formData.aboutProject}</p>
+                </div>
               </div>
             </div>
-          </div>
+          </div></>
         )}
       </div>
 
-      {/* Navigation Section */}
       <div className="form-navigation">
         {step === 1 && (
-         <div style={{ display: "flex", justifyContent: "flex-end", width: "100%"}}>
-           <button
+          <div style={{ display: "flex", 
+                justifyContent: "flex-end", 
+                width: "100%",
+              }}>
+          <button
             type="button" 
             className="button primary"
             onClick={handleNext}
           >
             Next
           </button>
-         </div>
+        </div>
         )}
         {step === 2 && (
           <>
